@@ -1,0 +1,206 @@
+{% extends "mupan.html" %}
+{% block js %}
+<script>
+    function Update() {
+        var branch = $("#select").val();
+        var user = $("#user").val();
+        if(branch === "none"){
+            alert("未选择代码分支，请检查！");
+            return false;
+        }else {
+            $.ajax({
+                type:"POST",
+                url:"/gongdan",
+                data:{"task":"update","branch":branch,"user":user},
+                dataType:"JSON",
+                beforeSend:function () {
+                    $("$msg").text("");
+                    var target = $("#msg").get(0);
+                    spinner.spin(target);
+                },
+                success:function (data) {
+                    return false;
+                },
+                error:function (e,jqxhr,settings,exception) {
+                    $("#msg").text("请求发生错误，请刷新页面...");
+                    spinner.spin();
+                }
+            });
+        }
+    }
+
+    function Status() {
+        var ENV = $("#ENV").val();
+        var user = $("#user").val();
+        if(ENV === "none"){
+            alert("请选择查看目标环境！");
+            return false;
+        }else {
+            $.ajax({
+                type:"POST",
+                url:"/gongdan",
+                data:{"task":"status","ENV":ENV,"user":user},
+                dataType:"JSON",
+                beforeSend:function () {
+                    $("$msg").text("");
+                    var target = $("#msg").get(0);
+                    spinner.spin(target);
+                },
+                success:function (data) {
+                    return false;
+                },
+                error:function (e,jqxhr,settings,exception) {
+                    $("#msg").text("请求发生错误，请刷新页面...");
+                    spinner.spin();
+                }
+            });
+        }
+    }
+
+    function Start() {
+        var ENV = $("#ENV").val();
+        var user = $("#user").val();
+        if(ENV === "none"){
+            alert("请选择目标环境！");
+            return false;
+        }else {
+            $.ajax({
+                type:"POST",
+                url:"/gongdan",
+                data:{"task":"start","user":user,"ENV":ENV},
+                dataType:"JSON",
+                beforeSend:function () {
+                    $("$msg").text("");
+                    var target = $("#msg").get(0);
+                    spinner.spin(target);
+                },
+                success:function (data) {
+                    return false;
+                },
+                error:function (e,jqxhr,settings,exception) {
+                    $("#msg").text("请求发生错误，请刷新页面...");
+                    spinner.spin();
+                }
+            });
+        }
+    }
+
+    function Stop() {
+        var ENV = $("#ENV").val();
+        var user = $("#user").val();
+        if(ENV === "none" || bkapp_name === null){
+            alert("请选择目标环境！");
+            return false;
+        }else {
+            $.ajax({
+                type:"POST",
+                url:"/gongdan",
+                data:{"task":"start","user":user,"ENV":ENV},
+                dataType:"JSON",
+                beforeSend:function () {
+                    $("$msg").text("");
+                    var target = $("#msg").get(0);
+                    spinner.spin(target);
+                },
+                success:function (data) {
+                    return false;
+                },
+                error:function (e,jqxhr,settings,exception) {
+                    $("#msg").text("请求发生错误，请刷新页面...");
+                    spinner.spin();
+                }
+            });
+        }
+    }
+
+    function Compiler() {
+        var branch = $("#select").val();
+        var user = $("#user").val();
+        if(branch === "none"){
+            alert("请检查编译代码的分支！");
+            return false;
+        }else {
+            $.ajax({
+                type:"POST",
+                url:"/gongdan",
+                data:{"task":"compiler","user":user,"branch":branch},
+                dataType:"JSON",
+                beforeSend:function () {
+                    $("$msg").text("");
+                    var target = $("#msg").get(0);
+                    spinner.spin(target);
+                },
+                success:function (data) {
+                    return false;
+                },
+                error:function (e,jqxhr,settings,exception) {
+                    $("#msg").text("请求发生错误，请刷新页面...");
+                    spinner.spin();
+                }
+            });
+        }
+    }
+
+    function Deploy() {
+        var ENV = $("#ENV").val();
+        var user = $("#user").val();
+        if(ENV === "none"){
+            alert("请检查分支和发布环境的选择！");
+            return false;
+        }else {
+            $.ajax({
+                type:"POST",
+                url:"/gongdan",
+                data:{"task":"deploy","user":user,"ENV":ENV},
+                dataType:"JSON",
+                beforeSend:function () {
+                    $("$msg").text("");
+                    var target = $("#msg").get(0);
+                    spinner.spin(target);
+                },
+                success:function (data) {
+                    return false;
+                },
+                error:function (e,jqxhr,settings,exception) {
+                    $("#msg").text("请求发生错误，请刷新页面...");
+                    spinner.spin();
+                }
+            });
+        }
+    }
+</script>
+{% end %}
+
+{% block first %}
+    <div id="gongdan" class="bg-info" style=float:left;width:85%;height:150px;border:1px #F00 solid;>
+        <br />
+        <label style="color: red;font:bold">您当前正在操作：工单进程</label>&nbsp;<label>--------</label>&nbsp;<label>Select Your Code SVN Branch:</label>
+        <label>
+            <select name="svn_branch" class="selectpicker show-tick form-control" id="select">
+                <option value="none">none</option>
+                <option value="trunk">trunk</option>
+                <option value="branch">branch</option>
+            </select>
+        </label>&nbsp;&nbsp;<label>--------------------</label>
+        <label>Select Deploy Environment:</label>
+        <label>
+            <select class="selectpicker show-tick form-control" id="ENV">
+                <option value="none">none</option>
+                <option value="XQNGCRM">XQNGCRM</option>
+                <option value="XQNGESOP">XQNGESOP</option>
+                <option value="JJNGCRM">JJNGCRM</option>
+                <option value="JJNGESOP">JJNGESOP</option>
+            </select>
+        </label><br/><br/>&emsp;&emsp;
+        <label><button onclick="Update()" id="Update" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play-circle"></span>&nbsp;更新代码</button></label>&emsp;&emsp;
+        <label><button onclick="Compiler()" id="Update" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play-circle"></span>&nbsp;编译工单</button></label>&emsp;&emsp;
+        <label><button onclick="Deploy()" id="Update" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play-circle"></span>&nbsp;发布到目标环境</button></label>&emsp;&emsp;
+        <label><button onclick="Start()" id="Update" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play-circle"></span>&nbsp;启动工单</button></label>&emsp;&emsp;
+        <label><button onclick="Stop()" id="Update" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play-circle"></span>&nbsp;停止工单</button></label>&emsp;&emsp;
+        <label><button onclick="Status()" id="Update" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play-circle"></span>&nbsp;查看工单状态</button></label>
+    </div>
+{% end %}
+
+{% block second %}
+    <div id="msg" style=filter:Alpha(Opacity=80,Style=0);opacity:0.80;background-color:black;color:#FFF;width:85%;height:630px;overflow:auto;border:1px #F00 solid;></div>
+{% end %}

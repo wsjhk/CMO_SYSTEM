@@ -1,0 +1,95 @@
+{% extends "mupan.html" %}
+{% block js %}
+<script src="../static/ace.js"></script>
+<script src="../static/ext-language_tools.js"></script>
+{% end %}
+{% block first %}
+    <div id="sqltext" class="ace_editor" onclick="check()" style=float:left;width:60%;height:150px;overflow:auto;border:1px #F00 solid;>在这里输入SQL语句，操作的表需要带上用户名前缀...</div>
+    <script>
+        var editor = ace.edit("sqltext");
+        editor.setTheme("ace/theme/monokai");
+        editor.session.setMode("ace/mode/sql");
+        editor.setFontSize(18);
+        editor.setReadOnly(false);
+        editor.setOption("wrap", "free");
+        ace.require("ace/ext/language_tools");
+        editor.setOptions({
+            enableBasicAutocompletion:true,
+            enableSnippets:true,
+            enableLiveAutocompletion:true
+        });
+        
+        function check() {
+            if (editor.getValue() === '在这里输入SQL语句，操作的表需要带上用户名前缀...'){
+                editor.setValue('');
+            }else if (editor.getValue() === '') {
+                editor.setValue('在这里输入SQL语句，操作的表需要带上用户名前缀...');
+            }else {
+                return false;
+            }
+        }
+
+        function RunSQL() {
+            var ENV = $("#select").val();
+            var sqltext = editor.getValue();
+            sqltext = sqltext.replace(/v\$/g,"v\\\\\\\$");
+            sqltext = sqltext.replace(/\"/g,"\\\\\\\"");
+            var user = $("#user").val();
+            if (sqltext === "在这里输入SQL语句，操作的表需要带上用户名前缀..."){
+                alert("请输入SQl语句!");
+                return false;
+            }else {
+                if(confirm("确认要执行此操作吗？") === true){
+                    $.ajax({
+                        type:"POST",
+                        url:"/sql_run",
+                        data:{"ENV":ENV,"user":user,"sqltext":sqltext},
+                        dataType:"JSON",
+                        beforeSend:function () {
+                            $("#msg").text("");
+                            var target = $("#msg").get(0);
+                            spinner.spin(target);
+                        },
+                        success:function (data) {
+                            return false;
+                        },
+                        error:function (e,jqxhr,settings,exception) {
+                            $("#msg").text("请求发生错误，请刷新页面...");
+                            spinner.spin();
+                        }
+                    });
+                }else {
+                    return false;
+                }
+            }
+        }
+    </script>
+    <div id="ENV" class="bg-info" style=float:left;width:25%;height:150px;border:1px #F00 solid;>
+        &nbsp;<label>请选择SQL执行的数据库环境：</label>
+        &nbsp;<select name="DB_ENV" class="selectpicker show-tick form-control" id="select" >
+            <optgroup label="需求环境" />
+                <option value="XQCRMDB">XQCRMDB</option>
+                <option value="XQESOPB">XQESOPB</option>
+                <option value="XQGDDB">XQGDDB</option>
+            <optgroup label="开发环境" />
+                <option value="KFCRMDB">KFCRMDB</option>
+                <option value="KFESOPB">KFESOPB</option>
+                <option value="KFGDDB">KFGDDB</option>
+            <optgroup label="紧急环境" />
+                <option value="JJCRMDB">JJCRMDB</option>
+                <option value="JJESOPB">JJESOPB</option>
+                <option value="JJGDDB">JJGDDB</option>
+            <optgroup label="联调环境" />
+                <option value="CRMLTDB">CRMLTDB</option>
+                <option value="LTGDDB">LTGDDB</option>
+        </select><br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;<label><button onClick="editor.setValue('');" id="reset" type="button" class="btn btn-success">
+        <span class="glyphicon glyphicon-play-circle"></span>&nbsp;&nbsp;清空</button></label>&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><button onClick="RunSQL()" id="run" type="button" class="btn btn-success">
+        <span class="glyphicon glyphicon-play-circle"></span>&nbsp;&nbsp;运行</button></label>
+    </div>
+{% end %}
+
+{% block second %}
+<div id="msg" style=filter:Alpha(Opacity=80,Style=0);opacity:0.80;background-color:black;color:yellow;width:85%;height:630px;overflow:auto;border:1px #F00 solid;></div>
+{% end %}

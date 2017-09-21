@@ -1,0 +1,83 @@
+{% extends "mupan.html" %}
+{% block first %}
+    <div id="log" class="bg-info" style=float:left;width:85%;height:150px;border:1px;text-indent:50px;>
+        <form action="" method="post" enctype="multipart/form-data">
+            <br />
+            <label for="ENV">选择数据库：</label>
+            <label><select name="ENV" class="selectpicker show-tick form-control" id="ENV">
+                <option></option>
+                <optgroup label="需求环境" />
+                    <option value="XQCRMDB">XQCRMDB</option>
+                    <option value="XQESOPDB">XQESOPDB</option>
+                    <option value="XQGDDB">XQGDDB</option>
+                <optgroup label="开发环境" />
+                    <option value="KFCRMDB">KFCRMDB</option>
+                    <option value="KFESOPDB">KFESOPDB</option>
+                    <option value="KFGDDB">KFGDDB</option>
+                <optgroup label="紧急环境" />
+                    <option value="JJCRMDB">JJCRMDB</option>
+                    <option value="JJESOPDB">JJESOPDB</option>
+                    <option value="JJGDDB">JJGDDB</option>
+                <optgroup label="联调环境" />
+                    <option value="CRMLTDB">CRMLTDB</option>
+                    <option value="LTGDDB">LTGDDB</option>
+                <optgroup label="独立进程" />
+                    <option value="XQNGCRM_BKAPP">XQNGCRM_BKAPP</option>
+                    <option value="XQNGESOP_BKAPP">XQNGESOP_BKAPP</option>
+                    <option value="XQGDCRM_BKAPP">XQGDCRM_BKAPP</option>
+                    <option value="JJNGCRM_BKAPP">JJNGCRM_BKAPP</option>
+                    <option value="JJNGESOP_BKAPP">JJNGESOP_BKAPP</option>
+                    <option value="JJGDCRM_BKAPP">JJGDCRM_BKAPP</option>
+                <optgroup label="CICS条带" />
+                    <option value="XQNGCRM_CICS">XQNGCRM_CICS</option>
+                    <option value="XQNGESOP_CICS">XQNGESOP_CICS</option>
+                    <option value="XQGDCRM_CICS">XQGDCRM_CICS</option>
+                    <option value="JJNGCRM_CICS">JJNGCRM_CICS</option>
+                    <option value="JJNGESOP_CICS">JJNGESOP_CICS</option>
+                    <option value="JJGDCRM_CICS">JJGDCRM_CICS</option>
+            </select></label>
+            <label>工号：</label>
+            <label><input type="text" name="gonghao" id="gonghao" class="selectpicker show-tick form-control"></label><br />
+            <label for="opr">操作类型：</label>
+            <label><select name="opr" class="selectpicker show-tick form-control" id="opr" >
+                <option></option>
+                <option value="INSERT">INSERT</option>
+                <option value="DELETE">DELETE</option>
+                <option value="UPDATE">UPDATE</option>
+                <option value="SELECT">SELECT</option>
+                <option value="CREATE">CREATE</option>
+                <option value="DROP">DROP</option>
+                <option value="ALTER">ALTER</option>
+                <option value="TRUNCATE">TRUNCATE</option>
+                <option value="GRANT">GRANT</option>
+                <option value="REVOKE">REVOKE</option>
+            </select></label>
+            <label>模糊查询:</label>
+            <label><input type="text" name="table" id="table" class="selectpicker show-tick form-control"></label>
+            <br />
+            <label>开始时间:</label>
+            <label><input type="datetime-local" name="starttime" id="starttime" class="selectpicker show-tick form-control"></label>
+            <label>结束时间:</label>
+            <label><input type="datetime-local" name="endtime" id="endtime" class="selectpicker show-tick form-control"></label>
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+            <button type="reset" class="btn btn-success"><span class="glyphicon glyphicon-play-circle"></span>&nbsp;&nbsp;重 置</button>
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+            <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-play-circle"></span>&nbsp;&nbsp;查 询</button>
+        </form>
+    </div>
+{% end %}
+
+{% block second %}
+    <div id="show" style=width:85%;height:630px;overflow:auto>
+        <table class="table table-bordered" border="1" align="center">
+            {% if res and extr == 0 %}
+                <tr style=background:#03f;color:#FFF;><td>id</td><td>工号</td><td>数据库</td><td>开始时间</td><td>结束时间</td><td>操作内容详情</td></tr>
+                {% for row in res %}
+                    <tr><td>{{ row['id'] }}</td><td>{{ row['gonghao'] }}</td><td>{{ row['db'] }}</td><td>{{ row['starttime'] }}</td><td>{{ row['endtime'] }}</td><td>{{ row['sql_content'] }}</td></tr>
+                {% end %}
+            {% elif extr == 1 %}
+                <span>查询的结果集记录数超过1000条，请选择合适的查询条件或者联系管理员！</span>
+            {% end %}
+        </table>
+    </div>
+{% end %}

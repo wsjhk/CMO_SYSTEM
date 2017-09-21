@@ -1,0 +1,42 @@
+{% extends "mupan.html" %}
+{% block first %}
+    <div id="upload" class="bg-info" style=float:left;width:30%;height:150px;border:1px #F00 solid;>
+        <form action="" onsubmit="return validator();" method="post" enctype="multipart/form-data">
+            <label for="select">请选择你要执行脚本的数据库环境：</label>
+            <select name="DB_ENV" class="selectpicker show-tick form-control" id="select" >
+                <optgroup label="需求环境" />
+                    <option value="XQCRMDB">XQCRMDB</option>
+                    <option value="XQESOPB">XQESOPB</option>
+                    <option value="XQGDDB">XQGDDB</option>
+                <optgroup label="开发环境" />
+                    <option value="KFCRMDB">KFCRMDB</option>
+                    <option value="KFESOPB">KFESOPB</option>
+                    <option value="KFGDDB">KFGDDB</option>
+                <optgroup label="紧急环境" />
+                    <option value="JJCRMDB">JJCRMDB</option>
+                    <option value="JJESOPB">JJESOPB</option>
+                    <option value="JJGDDB">JJGDDB</option>
+                <optgroup label="联调环境" />
+                    <option value="CRMLTDB">CRMLTDB</option>
+                    <option value="LTGDDB">LTGDDB</option>
+            </select>
+            <label class="control-label">Select File:</label>
+            <div class="form-group add-row" style="height:50%">
+                <input type="file" class="file" multiple="" id="file" name="files">
+            </div>
+        </form>
+    </div>
+    <div id="display" class="bg-info" style=float:left;width:55%;height:150px;overflow:auto;border:1px #F00 solid;>
+        <table class="table table-bordered" border="1" align="center">
+            {% if filenames and DBENV %}
+                <tr><td style=background:#03f;color:#FFF;>执行环境</td><td style=background:#03f;color:#FFF;>您上传的文件将按照以下顺序执行：</td></tr>
+                {% for file in filenames %}
+                    <tr><td>{{ DBENV }}</td><td>{{ file }}</td></tr>
+                {% end %}
+            {% end %}
+        </table>
+    </div>
+{% end %}
+{% block second %}
+    <div id="msg" style=filter:Alpha(Opacity=80,Style=0);opacity:0.80;background-color:black;color:#FFF;width:85%;height:630px;overflow:auto;border:1px #F00 solid;></div>
+{% end %}

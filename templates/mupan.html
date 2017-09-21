@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CMO自动化系统</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <link rel="stylesheet" href="../static/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../static/bootstrap/css/fileinput.min.css" />
+</head>
+<body>
+    <script src="../static/jquery.min.js"></script>
+    <script src="../static/spin.min.js"></script>
+    <script src="../static/bootstrap/js/bootstrap.js"></script>
+    <script src="../static/bootstrap/js/fileinput.min.js"></script>
+    <script>
+        var opts = {
+            lines:13,
+            length:20,
+            width:10,
+            radius:30,
+            corners:1,
+            rotate:0,
+            direction:1,
+            color:'#FF4500',
+            speed:1,
+            trail:60,
+            shadow:false,
+            hwaccel:false,
+            className:'spinner',
+            zIndex:2e9,
+            top:'50%',
+            left:'50%'
+        };
+        var spinner = new Spinner(opts);
+
+        $(document).ready(function() {
+            /* !window.WebSocket、window.MozWebSocket检测浏览器对websocket的支持*/
+            if (!window.WebSocket) {
+                if (window.MozWebSocket) {
+                    window.WebSocket = window.MozWebSocket;
+                } else {
+                    $('#msg').prepend("<p>您的浏览器不支持WebSocket,请使用火狐或者Chrome浏览器！</p>");
+                }
+            }
+            user = $("#user").val();
+            ws = new WebSocket("ws://localhost:8080/websocket/?user=" + user);
+            ws.onopen = function(evt) {
+                var date = new Date();
+                $('#msg').append('<span>'+ date +'</span><br/>');
+            };
+            ws.onmessage = function(evt) {
+                if(evt.data.match("To-all: ") !== null){
+                    var date = new Date().toLocaleTimeString();
+                    $('#all').prepend('['+ date +']'+ evt.data +'<br/>');
+                }else {
+                    $('#msg').append('<span>' + evt.data + '</span><br/>');
+                    if( evt.data == "----------------------更新完成------------------------" ||
+                        evt.data == "----------------------执行结束------------------------" ||
+                        evt.data == "----------------------CICS发布完成------------------------" ||
+                        evt.data == "----------------------BKAPP发布完成-----------------------" ||
+                        evt.data == "----------------------CICS编译完成------------------------" ||
+                        evt.data == "----------------------BKAPP编译完成-----------------------" ||
+                        evt.data == "----------------------CICS操作完成------------------------" ||
+                        evt.data == "----------------------BKAPP操作完成-----------------------" ||
+                        evt.data == "----------------------查看CICS状态结束-----------------------" ||
+                        evt.data == "----------------------查看进程状态结束-----------------------"){
+                        spinner.spin();
+                        return false;
+                    }
+                }
+            }
+        });
+
+        function doAction(index) {
+            var obj = document.getElementById('u' + index);
+            if(obj.style.display == 'none'){
+                obj.style.display = 'block';
+            }else {
+                obj.style.display = 'none';
+            }
+        }
+
+        function validator() {
+            var file_name = $('#file').val();
+            if(file_name == ""){
+                alert("未选择文件！");
+                return false;
+            }else {
+                if(confirm("确认要执行此操作吗？")==true){
+                    return true;
+                }else {
+                    return false;
+                }
+            }
+        }
+    </script>
+    {% block js %}
+
+    {% end %}
+    <div id="container" style=width:100%;margin:0px auto;>
+        <div id="header" style=width:100%;height:150px;border:1px #F00 solid;>
+            <div id="logo" class="bg-success" style=float:left;width:15%;height:150px;border:1px #F00 solid;>
+                <h4 style=color:brown;font-weight:bold;text-decoration:underline;>&emsp;
+                    <span class="glyphicon glyphicon-user"></span>&emsp;{{ user_id }}</h4>
+                <input type=hidden id="user" value="{{ user_id }}" />
+                &emsp;<i><span class="glyphicon glyphicon-flag"></span>&emsp;IP：</i><br/>
+                <i>&emsp;&emsp;{{ ip }}</i><br/>
+                &emsp;<i><span class="glyphicon glyphicon-flag"></span>&emsp;MAC：</i><br/>
+                <i>&emsp;&emsp;{{ macaddress }}</i>
+            </div>
+        {% block first %}
+
+        {% end %}
+        </div>
+        <div id="main" style=width:100%;height:630px;border:1px #F00 solid;>
+            <div id="menu" class="bg-danger" style=float:left;width:15%;height:630px;border:1px; #F00 solid;>
+                <div class="dropdown">
+                    <button class="btn btn-default" data-toggle="dropdown" style=background-color:snow;width:60%>
+                        下拉菜单
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" style=background-color:snow>
+                        <li class="dropdown-header">菜单导航</li>
+                        <li class="divider"></li>
+                        <li><a class="glyphicon glyphicon-home" href="/">&emsp;首页</a></li>
+                        <li><a class="glyphicon glyphicon-hand-right" href="/sql_piliang">&emsp;SQL脚本批量执行</a></li>
+                        <li><a class="glyphicon glyphicon-hand-right" href="/sql">&emsp;SQL语句执行</a></li>
+                        <li><a class="glyphicon glyphicon-hand-right" href="/bkapp">&emsp;独立进程更新发布</a></li>
+                        <li><a class="glyphicon glyphicon-hand-right" href="/cics">&emsp;CICS条带更新发布</a></li>
+                        <li><a class="glyphicon glyphicon-hand-right" href="/gongdan">&emsp;工单进程更新发布</a></li>
+                        <li><a class="glyphicon glyphicon-hand-right" href="/sqllog">&emsp;历史操作记录查询</a></li>
+                        <li><a class="glyphicon glyphicon-hand-right" href="/sql_awr">&emsp;历史SQL脚本和AWR报告</a></li>
+                    </ul>
+                </div><br/><br/>
+                <i><span class="glyphicon glyphicon-headphones">&emsp;实时公告消息：</span></i>
+                <div id="all" style=background:black;color:yellow;></div>
+            </div>
+            {% block second %}
+
+            {% end %}
+        </div>
+    </div>
+</body>
+</html>

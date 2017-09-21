@@ -1,0 +1,367 @@
+{% extends "mupan.html" %}
+{% block js %}
+<script>
+    function add(node,id,app_name) {
+        var select = $("#" + node);
+        var option = document.createElement("option");
+        option.innerHTML = app_name;
+        option.id = id;
+        select.append(option);
+    }
+
+    function getinfo(node,message,second) {
+        $.ajax({
+           type:"POST",
+            url:"/bkapp_op",
+            data:message,
+            dataType:"JSON",
+            success:function (data) {
+                var values = data[second];
+                for (var i = 0;i < values.length;i++){
+                    add(node,values[i],values[i]);
+                }
+            }
+        });
+    }
+    
+    function resetbkappname() {
+        $("#bkapp_name").empty();
+        $("#svn_path1").empty();
+        $("#svn_path2").empty();
+        $("#svn_path3").empty();
+        $("#svn_path4").empty();
+    }
+
+    function getbkappname() {
+        var branch = $("#select").val();
+        var bkapp_name = $("#bkapp_name").val();
+        if(branch === "none"){
+            alert("未选中代码分支!");
+            return false;
+        }else if(bkapp_name === null){
+            var curr_node = "bkapp_name";
+            var msg = {"select":"bkapp_name","branch":branch};
+            getinfo(curr_node,msg,curr_node);
+        }else{
+            return false;
+        }
+    }
+
+    function getsvnpath1() {
+        var branch = $("#select").val();
+        var svn_path1 = $("#svn_path1").val();
+        if (branch === "none"){
+            alert("未选中代码分支!");
+            return false;
+        }else if(svn_path1 === null){
+            var curr_node = "svn_path1";
+            var msg = {"select":"svn_path1","branch":branch};
+            getinfo(curr_node,msg,curr_node);
+        }else{
+            $("#svn_path2").empty();
+            $("#svn_path3").empty();
+            $("#svn_path4").empty();
+        }
+    }
+
+    function getsvnpath2() {
+        var branch = $("#select").val();
+        var svn_path1 = $("#svn_path1").val();
+        var svn_path2 = $("#svn_path2").val();
+        if (branch === "none"){
+            alert("未选中代码分支!");
+            return false;
+        }else if(svn_path1 === null){
+            alert("未选中父目录!");
+            return false;
+        }else if(svn_path2 === null){
+            var curr_node = "svn_path2";
+            var msg = {"select":"svn_path2","branch":branch,"svn_path1":svn_path1};
+            getinfo(curr_node,msg,curr_node);
+        }else{
+            $("#svn_path3").empty();
+            $("#svn_path4").empty();
+        }
+    }
+
+    function getsvnpath3() {
+        var branch = $("#select").val();
+        var svn_path1 = $("#svn_path1").val();
+        var svn_path2 = $("#svn_path2").val();
+        var svn_path3 = $("#svn_path3").val();
+        if (branch === "none"){
+            alert("未选中代码分支!");
+            return false;
+        }else if(svn_path2 === null){
+            alert("未选中父目录!");
+            return false;
+        }else if(svn_path3 === null){
+            var curr_node = "svn_path3";
+            var msg = {"select":"svn_path3","branch":branch,"svn_path1":svn_path1,"svn_path2":svn_path2};
+            getinfo(curr_node,msg,curr_node);
+        }else{
+            $("#svn_path4").empty();
+        }
+    }
+
+    function getsvnpath4() {
+        var branch = $("#select").val();
+        var svn_path1 = $("#svn_path1").val();
+        var svn_path2 = $("#svn_path2").val();
+        var svn_path3 = $("#svn_path3").val();
+        var svn_path4 = $("#svn_path4").val();
+        if (branch === "none"){
+            alert("未选中代码分支!");
+            return false;
+        }else if(svn_path3 === null){
+            alert("未选中父目录!");
+            return false;
+        }else if(svn_path4 === null){
+            var curr_node = "svn_path4";
+            var msg = {"select":"svn_path4","branch":branch,"svn_path1":svn_path1,"svn_path2":svn_path2,"svn_path3":svn_path3};
+            getinfo(curr_node,msg,curr_node);
+        }else{
+            return false;
+        }
+    }
+    
+    function Update() {
+        var branch = $("#select").val();
+        var user = $("#user").val();
+        var svn_path1 = $("#svn_path1").val();
+        var svn_path2 = $("#svn_path2").val();
+        var svn_path3 = $("#svn_path3").val();
+        var svn_path4 = $("#svn_path4").val();
+        var path = "";
+        if(branch === "none" || svn_path1 === null){
+            alert("未选择代码分支或代码路径，请检查！");
+            return false;
+        }else {
+            if(svn_path2 === null){
+                path = svn_path1;
+            }else if(svn_path3 === null){
+                path = svn_path1 + "/" + svn_path2;
+            }else if(svn_path4 === null){
+                path = svn_path1 + "/" + svn_path2 + "/" + svn_path3;
+            }else {
+                path = svn_path1 + "/" + svn_path2 + "/" + svn_path3 + "/" + svn_path4;
+            }
+            $.ajax({
+                type:"POST",
+                url:"/update",
+                data:{"branch":branch,"path":path,"user":user},
+                dataType:"JSON",
+                beforeSend:function () {
+                    $("$msg").text("");
+                    var target = $("#msg").get(0);
+                    spinner.spin(target);
+                },
+                success:function (data) {
+                    return false;
+                },
+                error:function (e,jqxhr,settings,exception) {
+                    $("#msg").text("请求发生错误，请刷新页面...");
+                    spinner.spin();
+                }
+            });
+        }
+    }
+
+    function Status() {
+        var ENV = $("#ENV").val();
+        var bkapp_name = $("#bkapp_name").val();
+        var user = $("#user").val();
+        if(ENV === "none" || bkapp_name === null){
+            alert("请选择bkapp_name和查看的目标环境！");
+            return false;
+        }else {
+            $.ajax({
+                type:"POST",
+                url:"/bkappstatus",
+                data:{"ENV":ENV,"user":user,"bkapp_name":bkapp_name},
+                dataType:"JSON",
+                beforeSend:function () {
+                    $("$msg").text("");
+                    var target = $("#msg").get(0);
+                    spinner.spin(target);
+                },
+                success:function (data) {
+                    return false;
+                },
+                error:function (e,jqxhr,settings,exception) {
+                    $("#msg").text("请求发生错误，请刷新页面...");
+                    spinner.spin();
+                }
+            });
+        }
+    }
+
+    function Start() {
+        var ENV = $("#ENV").val();
+        var bkapp_name = $("#bkapp_name").val();
+        var user = $("#user").val();
+        if(ENV === "none" || bkapp_name === null){
+            alert("请选择bkapp_name和查看的目标环境！");
+            return false;
+        }else {
+            $.ajax({
+                type:"POST",
+                url:"/bkappopr",
+                data:{"ENV":ENV,"user":user,"bkapp_name":bkapp_name,"opr":"start"},
+                dataType:"JSON",
+                beforeSend:function () {
+                    $("$msg").text("");
+                    var target = $("#msg").get(0);
+                    spinner.spin(target);
+                },
+                success:function (data) {
+                    return false;
+                },
+                error:function (e,jqxhr,settings,exception) {
+                    $("#msg").text("请求发生错误，请刷新页面...");
+                    spinner.spin();
+                }
+            });
+        }
+    }
+
+    function Stop() {
+        var ENV = $("#ENV").val();
+        var bkapp_name = $("#bkapp_name").val();
+        var user = $("#user").val();
+        if(ENV === "none" || bkapp_name === null){
+            alert("请选择bkapp_name和查看的目标环境！");
+            return false;
+        }else {
+            $.ajax({
+                type:"POST",
+                url:"/bkappopr",
+                data:{"ENV":ENV,"user":user,"bkapp_name":bkapp_name,"opr":"stop"},
+                dataType:"JSON",
+                beforeSend:function () {
+                    $("$msg").text("");
+                    var target = $("#msg").get(0);
+                    spinner.spin(target);
+                },
+                success:function (data) {
+                    return false;
+                },
+                error:function (e,jqxhr,settings,exception) {
+                    $("#msg").text("请求发生错误，请刷新页面...");
+                    spinner.spin();
+                }
+            });
+        }
+    }
+
+    function Compiler() {
+        var branch = $("#select").val();
+        var bkapp_name = $("#bkapp_name").val();
+        var user = $("#user").val();
+        if(branch === "none" || bkapp_name === null){
+            alert("请检查编译代码的分支和进程名字！");
+            return false;
+        }else {
+            $.ajax({
+                type:"POST",
+                url:"/bkappcompiler",
+                data:{"branch":branch,"user":user,"bkapp_name":bkapp_name},
+                dataType:"JSON",
+                beforeSend:function () {
+                    $("$msg").text("");
+                    var target = $("#msg").get(0);
+                    spinner.spin(target);
+                },
+                success:function (data) {
+                    return false;
+                },
+                error:function (e,jqxhr,settings,exception) {
+                    $("#msg").text("请求发生错误，请刷新页面...");
+                    spinner.spin();
+                }
+            });
+        }
+    }
+
+    function Deploy() {
+        var branch = $("#select").val();
+        var bkapp_name = $("#bkapp_name").val();
+        var ENV = $("#ENV").val();
+        var user = $("#user").val();
+        if(branch === "none" || bkapp_name === null || ENV === null){
+            alert("请检查分支，进程名称和发布环境的选择！");
+            return false;
+        }else {
+            $.ajax({
+                type:"POST",
+                url:"/bkappdeploy",
+                data:{"branch":branch,"user":user,"bkapp_name":bkapp_name,"ENV":ENV},
+                dataType:"JSON",
+                beforeSend:function () {
+                    $("$msg").text("");
+                    var target = $("#msg").get(0);
+                    spinner.spin(target);
+                },
+                success:function (data) {
+                    return false;
+                },
+                error:function (e,jqxhr,settings,exception) {
+                    $("#msg").text("请求发生错误，请刷新页面...");
+                    spinner.spin();
+                }
+            });
+        }
+    }
+</script>
+{% end %}
+
+{% block first %}
+    <div id="bkapp" class="bg-info" style=float:left;width:85%;height:150px;border:1px #F00 solid;>
+        <br />
+        <label style="color: red;font:bold">您当前正在操作：独立进程</label>&nbsp;<label>--------</label>&nbsp;<label>Select Your Code SVN Branch:</label>
+        <label>
+            <select name="svn_branch" class="selectpicker show-tick form-control" onclick="resetbkappname()" id="select">
+                <option value="none">none</option>
+                <option value="trunk">trunk</option>
+                <option value="branch">branch</option>
+            </select>
+        </label>&nbsp;&nbsp;<label>--------------------</label>
+        <label>Select bkapp name:</label>
+        <label>
+            <select class="selectpicker show-tick form-control" onclick="getbkappname()" id="bkapp_name"></select>
+        </label>
+        <br />
+        <label>Select Your Code SVN Path:</label>
+        <label>BUSINESS</label>&nbsp;/&nbsp;<label>
+            <select class="selectpicker show-tick form-control" onclick="getsvnpath1()" id="svn_path1">
+            </select></label>&nbsp;/&nbsp;<label>
+            <select class="selectpicker show-tick form-control" onclick="getsvnpath2()" id="svn_path2">
+            </select></label>&nbsp;/&nbsp;<label>
+            <select class="selectpicker show-tick form-control" onclick="getsvnpath3()" id="svn_path3">
+            </select></label>&nbsp;/&nbsp;<label>
+            <select class="selectpicker show-tick form-control" onclick="getsvnpath4()" id="svn_path4">
+            </select></label><br />
+        <label>Select Deploy Environment:</label>
+        <label>
+            <select class="selectpicker show-tick form-control" id="ENV">
+                <option value="none">none</option>
+                <option value="XQNGCRM">XQNGCRM</option>
+                <option value="XQNGESOP">XQNGESOP</option>
+                <option value="XQGDCRM">XQGDCRM</option>
+                <option value="JJNGCRM">JJNGCRM</option>
+                <option value="JJNGESOP">JJNGESOP</option>
+                <option value="JJGDCRM">JJGDCRM</option>
+            </select>
+        </label>
+        <label><button onclick="Update()" id="Update" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play-circle"></span>&nbsp;更新代码</button></label>
+        <label><button onclick="Compiler()" id="Update" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play-circle"></span>&nbsp;编译进程</button></label>
+        <label><button onclick="Deploy()" id="Update" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play-circle"></span>&nbsp;发布到目标环境</button></label>
+        <label><button onclick="Start()" id="Update" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play-circle"></span>&nbsp;启动进程</button></label>
+        <label><button onclick="Stop()" id="Update" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play-circle"></span>&nbsp;停止进程</button></label>
+        <label><button onclick="Status()" id="Update" type="button" class="btn btn-success"><span class="glyphicon glyphicon-play-circle"></span>&nbsp;查看进程状态</button></label>
+    </div>
+{% end %}
+
+{% block second %}
+    <div id="msg" style=filter:Alpha(Opacity=80,Style=0);opacity:0.80;background-color:black;color:#FFF;width:85%;height:630px;overflow:auto;border:1px #F00 solid;></div>
+{% end %}

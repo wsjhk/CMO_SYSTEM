@@ -1,0 +1,12 @@
+<table border="1">
+    <tr>
+        <td>ERROR: </td>
+        <td>只能上传txt或者SQL后缀的脚本文件！请确认重新上传！！！</td>
+    </tr>
+    {% if filename %}
+    <tr>
+        <td>ERROR: </td>
+        <td>{{ filename }}</td>
+    </tr>
+    {% end %}
+</table>
