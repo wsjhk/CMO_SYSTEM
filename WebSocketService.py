@@ -241,7 +241,7 @@ class sql_piliang(tornado.web.RequestHandler):
         ws.write(0,2,'start_time')
         ws.write(0,3,'end_time')
         ws.write(0,4,'DB_environment')
-        ws.save(filename)
+        wb.save(filename)
 
     def write_to_xls(self, filename,row,col,value):
         if os.path.isfile(filename):
