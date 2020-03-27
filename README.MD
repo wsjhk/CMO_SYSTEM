@@ -1,4 +1,5 @@
-这是一个基于python tornado框架，结合了jquery+bootstrap+ajax+websocket+mysql实现的小型自动化运维系统。支持的功能有：
+> 这是一个基于python tornado框架，结合了jquery+bootstrap+ajax+websocket+mysql实现的小型自动化运维系统。支持的功能有：
+```
   1.提交执行的sql脚本文件，可以批量执行多个脚本文件。并保存脚本和记录操作记录到excel并发邮件（携带excel附件）。 
   
   2.执行单条或者多条sql语句，并通过websocket实时显示执行的过程和结果。记录操作信息到mysql中。
@@ -10,8 +11,12 @@
   5.支持在线查看执行的历史sql脚本内容，并在线生成和查看oracle数据库的awr报告，便于分析oracle数据库的性能。
   
   6.执行并发（采用多线程），对于影响较大的服务的操作会在公告栏实时显示出操作人和操作的信息，时间等。
-实时通讯采用websocket，更新和编译代码中页面的代码路径信息的选择通过ajax实时从服务器中获取。
-以下是一个python实现nosql的demo：
+ ```
+  
+> 实时通讯采用websocket，更新和编译代码中页面的代码路径信息的选择通过ajax实时从服务器中获取。
+
+> 以下是一个python实现nosql的demo：
+```
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """NoSQL database written in Python"""
@@ -210,3 +215,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+```
