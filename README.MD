@@ -15,6 +15,15 @@
   
 > 实时通讯采用websocket，更新和编译代码中页面的代码路径信息的选择通过ajax实时从服务器中获取。
 
+## 功能截图
+![image](https://github.com/wsjhk/CMO_SYSTEM/blob/master/1.jpg)
+![image](https://github.com/wsjhk/CMO_SYSTEM/blob/master/2.jpg)
+![image](https://github.com/wsjhk/CMO_SYSTEM/blob/master/3.jpg)
+![image](https://github.com/wsjhk/CMO_SYSTEM/blob/master/4.jpg)
+![image](https://github.com/wsjhk/CMO_SYSTEM/blob/master/5.jpg)
+![image](https://github.com/wsjhk/CMO_SYSTEM/blob/master/6.jpg)
+
+
 > 以下是一个python实现nosql的demo：
 ```
 #!/usr/bin/env python
